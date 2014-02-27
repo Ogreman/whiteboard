@@ -7,9 +7,13 @@ from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.api.decorators import set_renderers
 from flask.ext.api.renderers import HTMLRenderer
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
 
-app = FlaskAPI(__name__)
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from unipath import Path
+
+TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
+
+app = FlaskAPI(__name__, template_folder=TEMPLATE_DIR)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
