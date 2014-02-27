@@ -2,7 +2,7 @@
 
 import datetime, os
 
-from flask import request, url_for
+from flask import request, url_for, render_template
 from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
@@ -33,6 +33,11 @@ class Note(db.Model):
                 key=self.id
             ),
         }
+
+
+@app.route("/index/", methods=['GET'])
+def index():
+    return render_template("index.html")
 
 
 @app.route("/", methods=['GET', 'POST'])

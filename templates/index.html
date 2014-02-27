@@ -8,45 +8,32 @@
     font-size: 35px;
 ">
 
-<input type="file" id="files"/>
-<p id="status"></p>
+<p id="notes"></p>
 
-<form method="POST" action="/submit_form/">
-    <input type="hidden" id="image_url" name="image_url" value="{{ current_image }}" />
-    <input type="submit" id="btn" value="Update" />
+<form method="POST" action="/">
+    <input type="text" />
+    <input type="submit" id="btn" value="Post" />
 </form>
 </h1>
-
-<div id="preview" style=""><img src="{{ current_image }}" style="width:90%; bottom:5px;"/></div>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="/static/lodash.min.js"></script>
 <script type="text/javascript" src="/static/s3upload.js"></script>
 
 <script type="text/javascript">
-function s3_upload(){
-    var s3upload = new S3Upload({
-        file_dom_selector: '#files',
-        s3_sign_put_url: '/sign_s3/',
-        onProgress: function(percent, message) {
-            $('#status').html('Upload progress: ' + percent + '% ' + message);
-            $('#btn').attr('disabled', true);
-        },
-        onFinishS3Put: function(public_url) {
-            $('#status').html('Upload completed.');
-            $("#image_url").val(public_url);
-            $("#preview").html('<img src="'+public_url+'" style="width:300px;" />');
-            $('#btn').attr('disabled', false);
-        },
-        onError: function(status) {
-            $('#status').html('Upload error: ' + status);
-        }
+if (window.jQuery){
+    $(function() {
+        $.getJSON($SCRIPT_ROOT + '/', {}, function(data) {
+            if (data.message) {
+                console.log(data.message);
+            } else {
+                $('#notes')[0].innerHTML=data;
+            }
+        });
+        return false;
     });
+} else {
 }
-
-$().ready(function() {
-    $('#files').on("change", s3_upload);
-});
 </script>
 
 {% endblock %}
