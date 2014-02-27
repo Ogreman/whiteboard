@@ -45,10 +45,10 @@ function handleForm(){
             $.post('/api/', {
                 text: $("#text").val()
             }, function(data) {
+                $("#text").val("");
                 if (data.message) {
-                    console.log(data.error_message);
+                    $("#status")[0].innerHTML=data.message;
                 } else {
-                    $("#text").val("");
                     if (data.created) {
                         $("#status")[0].innerHTML="POSTED!"
                     } else {

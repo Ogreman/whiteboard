@@ -6,6 +6,7 @@ from flask import request, url_for, render_template
 from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.api.decorators import set_renderers
 from flask.ext.api.renderers import HTMLRenderer
+from flask.ext.api.exceptions import APIException
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
@@ -14,7 +15,7 @@ from unipath import Path
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
 
 app = FlaskAPI(__name__, template_folder=TEMPLATE_DIR)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite+pysqlite:///sqlite.db'
 db = SQLAlchemy(app)
 
 
@@ -54,6 +55,8 @@ def notes_list():
     """
     if request.method == 'POST':
         text = str(request.data.get('text', ''))
+        if not text:
+            return { "message": "Please enter text" }, status.HTTP_204_NO_CONTENT
         note = Note(text=text)
         db.session.add(note)
         db.session.commit()
