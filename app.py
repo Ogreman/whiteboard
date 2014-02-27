@@ -4,6 +4,8 @@ import datetime, os
 
 from flask import request, url_for, render_template
 from flask.ext.api import FlaskAPI, status, exceptions
+from flask.ext.api.decorators import set_renderers
+from flask.ext.api.renderers import HTMLRenderer
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 
@@ -36,6 +38,7 @@ class Note(db.Model):
 
 
 @app.route("/index/", methods=['GET'])
+@set_renderers(HTMLRenderer)
 def index():
     return render_template("index.html")
 
