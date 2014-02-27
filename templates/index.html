@@ -18,18 +18,23 @@
 </h1>
 
 <script type="text/javascript">
-if (window.jQuery){
-    $(function() {
-        $.getJSON($SCRIPT_ROOT + '/', {}, function(data) {
-            if (data.message) {
-                console.log(data.message);
-            } else {
-                $('#notes')[0].innerHTML=data;
-            }
+function getPosts(){
+    if (window.jQuery){
+        $(function() {
+            $('#notes')[0].innerHTML = '';
+            $.getJSON($SCRIPT_ROOT + '/', {}, function(data) {
+                if (data.message) {
+                    console.log(data.message);
+                } else {
+                    $.each(data, function(k, v) {
+                        $('#notes')[0].innerHTML += "<p>" + v.text + "</p>";
+                    });
+                }
+            });
+            return false;
         });
-        return false;
-    });
-} else {
+    } else {
+    }
 }
 
 function handleForm(){
@@ -43,18 +48,22 @@ function handleForm(){
                     console.log(data.error_message);
                 } else {
                     if (data.created) {
-                        $("#amt")[0].innerHTML="POSTED!"
+                        $("#status")[0].innerHTML="POSTED!"
                     } else {
-                        $("#amt")[0].innerHTML="FAILED!"
+                        $("#status")[0].innerHTML="FAILED!"
                     }
                 }
             });
             return false;
         });
+        getPosts();
     } else {
 
     }
 }
+
+getPosts();
+
 </script>
 
 {% endblock %}
