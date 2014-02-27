@@ -67,7 +67,7 @@ def notes_list():
         note.to_json() for note in Note.query.filter(
             Note.deleted == False
         ).order_by(
-            desc(Note.created)
+            desc(Note.id),
         )
     ]
 
