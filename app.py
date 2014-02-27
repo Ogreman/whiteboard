@@ -8,7 +8,7 @@ from flask.ext.api.decorators import set_renderers
 from flask.ext.api.renderers import HTMLRenderer
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from unipath import Path
 
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
@@ -41,13 +41,13 @@ class Note(db.Model):
         }
 
 
-@app.route("/index/", methods=['GET'])
+@app.route("/", methods=['GET'])
 @set_renderers([HTMLRenderer])
 def index():
     return render_template('index.html')
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/api/", methods=['GET', 'POST'])
 def notes_list():
     """
     List or create notes.
@@ -60,10 +60,16 @@ def notes_list():
         return note.to_json(), status.HTTP_201_CREATED
 
     # request.method == 'GET'
-    return [note.to_json() for note in Note.query.all()]
+    return [
+        note.to_json() for note in Note.query.filter(
+            Note.deleted == False
+        ).order_by(
+            desc(Note.created)
+        )
+    ]
 
 
-@app.route("/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
+@app.route("/api/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
 def notes_detail(key):
     """
     Retrieve, update or delete note instances.
@@ -81,7 +87,8 @@ def notes_detail(key):
         return note.to_json()
 
     elif request.method == 'DELETE':
-        db.session.delete(note)
+        note.deleted = True
+        db.session.add(note)
         db.session.commit()
         return '', status.HTTP_204_NO_CONTENT
 

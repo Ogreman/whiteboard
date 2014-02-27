@@ -9,12 +9,13 @@
     font-size: 35px;
 ">
 
-<p id="notes"></p>
-
-<input type="text" id="text" name="text" />
+<input type="text" id="text" name="text" onkeydown="if (event.keyCode == 13) document.getElementById('btnPost').click()" />
 <button id="btnPost" onclick="handleForm()" type="button">post</button>
-<div id="status" style="font-size: 130px;"></div>
+<div id="status" style="font-size: 30px;"></div>
+</h1>
 
+<h1 style="position: relative; top: 100px; left: 15px;">
+<p id="notes"></p>
 </h1>
 
 <script type="text/javascript">
@@ -22,12 +23,12 @@ function getPosts(){
     if (window.jQuery){
         $(function() {
             $('#notes')[0].innerHTML = '';
-            $.getJSON($SCRIPT_ROOT + '/', {}, function(data) {
+            $.getJSON($SCRIPT_ROOT + '/api/', {}, function(data) {
                 if (data.message) {
                     console.log(data.message);
                 } else {
                     $.each(data, function(k, v) {
-                        $('#notes')[0].innerHTML += "<p>" + v.text + "</p>";
+                        $('#notes')[0].innerHTML += '<p><a href="' + v.url + '">' + v.text + "</a></p>";
                     });
                 }
             });
@@ -41,12 +42,13 @@ function handleForm(){
     if (window.jQuery){
         $(function() {
             $("#status")[0].innerHTML="posting..."
-            $.post('/', {
+            $.post('/api/', {
                 text: $("#text").val()
             }, function(data) {
                 if (data.message) {
                     console.log(data.error_message);
                 } else {
+                    $("#text").val("");
                     if (data.created) {
                         $("#status")[0].innerHTML="POSTED!"
                     } else {
@@ -56,10 +58,9 @@ function handleForm(){
             });
             return false;
         });
-        getPosts();
     } else {
-
     }
+    getPosts();
 }
 
 getPosts();
