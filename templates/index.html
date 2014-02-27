@@ -1,5 +1,6 @@
 
 {% extends 'layout.html' %}
+
 {% block body %}
 <h1 id="check" style="
     position: fixed;
@@ -10,15 +11,11 @@
 
 <p id="notes"></p>
 
-<form method="POST" action="/">
-    <input type="text" />
-    <input type="submit" id="btn" value="Post" />
-</form>
-</h1>
+<input type="text" id="text" name="text" />
+<button id="btnPost" onclick="handleForm()" type="button">post</button>
+<div id="status" style="font-size: 130px;"></div>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="/static/lodash.min.js"></script>
-<script type="text/javascript" src="/static/s3upload.js"></script>
+</h1>
 
 <script type="text/javascript">
 if (window.jQuery){
@@ -33,6 +30,30 @@ if (window.jQuery){
         return false;
     });
 } else {
+}
+
+function handleForm(){
+    if (window.jQuery){
+        $(function() {
+            $("#status")[0].innerHTML="posting..."
+            $.post('/', {
+                text: $("#text").val()
+            }, function(data) {
+                if (data.message) {
+                    console.log(data.error_message);
+                } else {
+                    if (data.created) {
+                        $("#amt")[0].innerHTML="POSTED!"
+                    } else {
+                        $("#amt")[0].innerHTML="FAILED!"
+                    }
+                }
+            });
+            return false;
+        });
+    } else {
+
+    }
 }
 </script>
 

@@ -14,7 +14,7 @@ from unipath import Path
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
 
 app = FlaskAPI(__name__, template_folder=TEMPLATE_DIR)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite+pysqlite:///sqlite.db'
 db = SQLAlchemy(app)
 
 
