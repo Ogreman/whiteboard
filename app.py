@@ -33,7 +33,7 @@ class Note(db.Model):
     def to_json(self):
         return {
             'id': self.id,
-            'text': escape(self.text),
+            'text': str(escape(self.text)),
             'created': str(self.created),
             'url': request.host_url.rstrip('/') + url_for(
                 'notes_detail',
