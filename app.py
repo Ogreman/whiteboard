@@ -1,8 +1,8 @@
 # app.py
 
-import datetime, os
+import datetime, os, json
 
-from flask import request, url_for
+from flask import request, url_for, jsonify, make_response
 from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
@@ -48,7 +48,10 @@ def notes_list():
         return note.to_json(), status.HTTP_201_CREATED
 
     # request.method == 'GET'
-    return [note.to_json() for note in Note.query.all()]
+    values = [note.to_json() for note in Note.query.all()]
+    response = make_response()
+    response.data = json.dumps(values)
+    return response
 
 
 @app.route("/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
@@ -66,7 +69,7 @@ def notes_detail(key):
             note = Note(text=text)
         db.session.add(note)
         db.session.commit()
-        return note.to_json()
+        return jsonify(note.to_json())
 
     elif request.method == 'DELETE':
         db.session.delete(note)
@@ -76,7 +79,7 @@ def notes_detail(key):
     # request.method == 'GET'
     if not note:
         raise exceptions.NotFound()
-    return note.to_json()
+    return jsonify(note.to_json())
 
 
 if __name__ == "__main__":
