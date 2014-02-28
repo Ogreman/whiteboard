@@ -2,7 +2,7 @@
 
 import datetime, os
 
-from flask import request, url_for, render_template, escape
+from flask import request, url_for, render_template, escape, Markup
 from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.api.decorators import set_renderers
 from flask.ext.api.renderers import HTMLRenderer
@@ -11,6 +11,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from unipath import Path
+
+import bleach
 
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
 
@@ -33,7 +35,7 @@ class Note(db.Model):
     def to_json(self):
         return {
             'id': self.id,
-            'text': str(escape(self.text)),
+            'text': str(self.text),
             'created': str(self.created),
             'url': request.host_url.rstrip('/') + url_for(
                 'notes_detail',
@@ -67,10 +69,12 @@ def notes_list():
     List or create notes.
     """
     if request.method == 'POST':
-        text = str(request.data.get('text', ''))
+        text = request.data.get('text', '')
         if not text:
             return { "message": "Please enter text" }, status.HTTP_204_NO_CONTENT
-        note = Note(text=text)
+        note = Note(
+            text=bleach.clean(text)
+        )
         db.session.add(note)
         db.session.commit()
         return note.to_json(), status.HTTP_201_CREATED
@@ -97,9 +101,11 @@ def notes_detail(key):
     if request.method == 'PUT':
         text = str(request.data.get('text', ''))
         if note:
-            note.text = text
+            note.text = bleach.clean(text)
         else:
-            note = Note(text=text)
+            note = Note(
+                text=bleach.clean(text)
+            )
         db.session.add(note)
         db.session.commit()
         return note.to_json()
