@@ -39,13 +39,26 @@ class Note(db.Model):
                 'notes_detail',
                 key=self.id
             ),
+            'parent_url': request.host_url.rstrip('/') + url_for(
+                'notes_list'
+            ),
         }
+
+    @classmethod
+    def get_notes(self):
+        return [
+            note.to_json() for note in Note.query.filter(
+                Note.deleted == False
+            ).order_by(
+                desc(Note.id),
+            )
+        ]
 
 
 @app.route("/", methods=['GET'])
 @set_renderers([HTMLRenderer])
 def index():
-    return render_template('index.html')
+    return render_template('index.html', notes=Note.get_notes())
 
 
 @app.route("/api/", methods=['GET', 'POST'])
@@ -63,13 +76,7 @@ def notes_list():
         return note.to_json(), status.HTTP_201_CREATED
 
     # request.method == 'GET'
-    return [
-        note.to_json() for note in Note.query.filter(
-            Note.deleted == False
-        ).order_by(
-            desc(Note.id),
-        )
-    ]
+    return Note.get_notes()
 
 
 @app.route("/api/<int:key>/", methods=['GET', 'PUT', 'DELETE'])

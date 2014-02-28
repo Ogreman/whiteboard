@@ -15,7 +15,7 @@
 </h1>
 
 <h1 style="position: relative; top: 100px; left: 15px;">
-<p id="notes"></p>
+<p id="notes">{% for note in notes %}{{ note.text }}{% endfor %}</p>
 </h1>
 
 <script type="text/javascript">
@@ -63,7 +63,7 @@ function handleForm(){
     getPosts();
 }
 
-getPosts();
+setInterval(getPosts(), 1000);
 
 </script>
 
