@@ -81,8 +81,10 @@ def notes_list():
 
 @app.route("/api/latest/", methods=['GET'])
 def latest():
-    # request.method == 'GET'
-    return Note.get_notes()[0]
+    try:
+        return Note.get_notes()[0]
+    except IndexError:
+        return { "message": "No posts" }, status.HTTP_204_NO_CONTENT
 
 
 @app.route("/api/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
