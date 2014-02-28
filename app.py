@@ -2,7 +2,7 @@
 
 import datetime, os
 
-from flask import request, url_for, render_template
+from flask import request, url_for, render_template, escape
 from flask.ext.api import FlaskAPI, status, exceptions
 from flask.ext.api.decorators import set_renderers
 from flask.ext.api.renderers import HTMLRenderer
@@ -33,7 +33,7 @@ class Note(db.Model):
     def to_json(self):
         return {
             'id': self.id,
-            'text': self.text,
+            'text': str(escape(self.text)),
             'created': str(self.created),
             'url': request.host_url.rstrip('/') + url_for(
                 'notes_detail',
