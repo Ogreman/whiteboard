@@ -79,6 +79,12 @@ def notes_list():
     return Note.get_notes()
 
 
+@app.route("/api/latest/", methods=['GET'])
+def latest():
+    # request.method == 'GET'
+    return Note.get_notes()[0]
+
+
 @app.route("/api/<int:key>/", methods=['GET', 'PUT', 'DELETE'])
 def notes_detail(key):
     """

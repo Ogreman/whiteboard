@@ -11,11 +11,17 @@
 
 <input type="text" id="text" name="text" onkeydown="if (event.keyCode == 13) document.getElementById('btnPost').click()" />
 <button id="btnPost" onclick="handleForm()" type="button">post</button>
+<button id="btnRefr" onclick="getPosts()" type="button">refresh</button>
 <div id="status" style="font-size: 30px;"></div>
 </h1>
 
 <h1 style="position: relative; top: 100px; left: 15px;">
-<p id="notes">{% for note in notes %}{{ note.text }}{% endfor %}</p>
+<p id="notes">
+    {% for note in notes %}
+        {% if forloop.first %}<div id="new" />{% endif %}
+        <p id="note-{{ note.id }}"><a href="{{ note.url }}">{{ note.text }}</a></p>
+    {% endfor %}
+</p>
 </h1>
 
 <script type="text/javascript">
@@ -28,8 +34,26 @@ function getPosts(){
                     console.log(data.message);
                 } else {
                     $.each(data, function(k, v) {
-                        $('#notes')[0].innerHTML += '<p><a href="' + v.url + '">' + v.text + "</a></p>";
+                        $('#notes')[0].innerHTML += '<p id="note-' + v.id + '"><a href="' + v.url + '">' + v.text + "</a></p>";
                     });
+                }
+            });
+            return false;
+        });
+    } else {
+    }
+}
+
+function getLatest(){
+    if (window.jQuery){
+        $(function() {
+            $.getJSON($SCRIPT_ROOT + '/api/latest/', {}, function(data) {
+                if (data.message) {
+                    console.log(data.message);
+                } else {
+                    if ($('#note-' + data.id).length === 0) {
+                        $('<p id="note-' + data.id + '"><a href="' + data.url + '">' + data.text + "</a></p>").insertAfter("#new");
+                    }
                 }
             });
             return false;
@@ -50,6 +74,7 @@ function handleForm(){
                     $("#status")[0].innerHTML=data.message;
                 } else {
                     if (data.created) {
+                        $('<p id="note-' + data.id + '"><a href="' + data.url + '">' + data.text + "</a></p>").insertAfter("#new");
                         $("#status")[0].innerHTML="POSTED!"
                     } else {
                         $("#status")[0].innerHTML="FAILED!"
@@ -60,10 +85,9 @@ function handleForm(){
         });
     } else {
     }
-    getPosts();
 }
 
-window.setInterval(getPosts, 1000);
+window.setInterval(getLatest, 1000);
 
 </script>
 
